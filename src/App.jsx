@@ -24,6 +24,7 @@ import {
   FileUp, Zap, Activity, Box, Menu, X
 } from 'lucide-react';
 
+// Firebase Configuration for circlekay00/rdc1
 const firebaseConfig = {
   apiKey: "AIzaSyAL2mCMWL-FO9HEnmoMf5LTDFIVCzoElF8",
   authDomain: "rdc1-df539.firebaseapp.com",
@@ -39,6 +40,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const appId = 'rdc1';
 
+// Helper to load XLSX library dynamically for bulk uploads
 const loadXLSX = () => {
   return new Promise((resolve) => {
     if (window.XLSX) return resolve(window.XLSX);
@@ -66,6 +68,7 @@ export default function App() {
 
   const fileInputRef = useRef(null);
 
+  // Initialize Anonymous Auth for Guest Search
   useEffect(() => {
     const initAuth = async () => {
       try {
@@ -83,6 +86,7 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
+  // Listen for Real-time Inventory Data
   useEffect(() => {
     if (!user) return;
     const dataPath = collection(db, 'artifacts', appId, 'public', 'data', 'gemini');
@@ -95,6 +99,7 @@ export default function App() {
     return () => unsubscribe();
   }, [user]);
 
+  // Search Logic with Scoring
   const filteredItems = useMemo(() => {
     const term = searchTerm.toLowerCase().trim();
     if (!term) return []; 
@@ -227,7 +232,7 @@ export default function App() {
           <div className="search-view">
             <div className="hero">
               <h1 className="gradient-title">Search RDC</h1>
-              <p className="subtitle">muhammad.azeem@circlek.com</p>
+              <p className="subtitle">Operational Inventory</p>
               <div className="search-bar glass-search">
                 <Search className="accent-orange" size={20} />
                 <input 
@@ -288,7 +293,7 @@ export default function App() {
                 <div className="admin-header">
                   <h2 className="admin-title-main">Management</h2>
                   <div className="admin-actions">
-                    <button onClick={() => setShowUploadModal(true)} className="glass-btn secondary icon-only"><FileUp size={18} /></button>
+                    <button onClick={() => setShowUploadModal(true)} className="glass-btn secondary icon-only" title="Upload File"><FileUp size={18} /></button>
                     <button onClick={() => setShowModal(true)} className="glass-btn primary"><Plus size={18} /> Add</button>
                   </div>
                 </div>
@@ -329,8 +334,8 @@ export default function App() {
                             </td>
                             <td className="text-right">
                               <div className="action-row">
-                                <button onClick={() => { setEditingItem(item); setItemForm(item); setShowModal(true); }} className="action-icon-btn"><Edit3 size={16} /></button>
-                                <button onClick={() => deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'gemini', item.id))} className="action-icon-btn delete"><Trash2 size={16} /></button>
+                                <button onClick={() => { setEditingItem(item); setItemForm(item); setShowModal(true); }} className="action-icon-btn" title="Edit"><Edit3 size={16} /></button>
+                                <button onClick={() => deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'gemini', item.id))} className="action-icon-btn delete" title="Delete"><Trash2 size={16} /></button>
                               </div>
                             </td>
                           </tr>
@@ -358,6 +363,7 @@ export default function App() {
               <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept=".csv, .xlsx, .xls" hidden />
               <FileUp size={32} className="accent-green" />
               <p>{uploadStatus.loading ? 'Uploading...' : 'Tap to select file'}</p>
+              <small className="text-muted">Supports XLSX / CSV</small>
             </div>
             {uploadStatus.message && (
               <p className={`status-text ${uploadStatus.type}`}>{uploadStatus.message}</p>
@@ -424,6 +430,7 @@ export default function App() {
           font-family: 'Josefin Sans', sans-serif;
           -webkit-font-smoothing: antialiased;
           overflow-x: hidden;
+          overscroll-behavior-y: contain;
         }
 
         .app-container {
@@ -450,6 +457,11 @@ export default function App() {
           justify-content: space-between;
           padding: 0.75rem 1.25rem;
         }
+
+        .logo-section { display: flex; align-items: center; gap: 0.5rem; }
+        .logo-text { font-weight: 700; font-size: 1.1rem; letter-spacing: -0.5px; }
+        .accent-orange { color: var(--orange); }
+        .orange-glow { filter: drop-shadow(0 0 5px var(--orange)); color: var(--orange); }
 
         .mobile-menu-toggle {
           display: none;
@@ -482,7 +494,9 @@ export default function App() {
           width: 90%; max-width: 600px; margin: 1.5rem auto; border-radius: 16px;
           display: flex; align-items: center; padding: 0.75rem 1.25rem;
           box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+          transition: border-color 0.2s;
         }
+        .glass-search:focus-within { border-color: var(--orange); }
         .glass-search input {
           font-family: 'Josefin Sans', sans-serif;
           background: transparent; border: none; color: white; width: 100%; margin-left: 0.75rem;
@@ -512,6 +526,7 @@ export default function App() {
         .white-text { margin: 0; font-weight: 600; font-size: 0.9rem; font-family: monospace; }
 
         .glass-btn { font-family: 'Josefin Sans', sans-serif; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.6rem 1.25rem; }
+        .glass-btn:active { transform: scale(0.98); }
         .glass-btn.primary { background: var(--orange); color: white; }
         .glass-btn.secondary { background: var(--glass); border: 1px solid var(--glass-border); color: var(--white); }
         .glass-btn.flat { background: transparent; color: var(--text-muted); }
@@ -527,34 +542,43 @@ export default function App() {
         .glass-table td { padding: 1rem 0.75rem; border-bottom: 1px solid var(--glass-border); vertical-align: top; }
         
         .action-row { display: flex; gap: 0.5rem; justify-content: flex-end; }
-        .action-icon-btn { background: var(--glass); border: 1px solid var(--glass-border); color: var(--text-muted); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .action-icon-btn.delete:hover { color: #ef4444; }
+        .action-icon-btn { background: var(--glass); border: 1px solid var(--glass-border); color: var(--text-muted); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+        .action-icon-btn:hover { background: var(--glass-border); color: white; }
+        .action-icon-btn.delete:hover { color: #ef4444; border-color: #ef4444; }
 
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: flex-end; justify-content: center; z-index: 1000; }
-        .modal { width: 100%; max-height: 90vh; overflow-y: auto; border-radius: 1.5rem 1.5rem 0 0 !important; animation: slideUp 0.3s ease-out; }
+        .input-group { margin-bottom: 1.25rem; }
+        .input-group label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 600; }
+        .glass-input { width: 100%; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 10px; padding: 0.75rem; color: white; font-family: inherit; font-size: 1rem; box-sizing: border-box; }
+        .glass-input:focus { border-color: var(--orange); outline: none; }
+
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); display: flex; align-items: flex-end; justify-content: center; z-index: 1000; }
+        .modal { background: var(--bg-dark); border: 1px solid var(--glass-border); width: 100%; max-height: 90vh; overflow-y: auto; border-radius: 1.5rem 1.5rem 0 0 !important; animation: slideUp 0.3s ease-out; padding: 1.5rem; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-        .form-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-        .modal-actions { display: flex; flex-direction: column-reverse; gap: 0.75rem; margin-top: 1.5rem; }
+        .glass-dropzone { border: 2px dashed var(--glass-border); border-radius: 16px; padding: 2rem; text-align: center; cursor: pointer; transition: 0.2s; margin-bottom: 1rem; }
+        .glass-dropzone:hover { border-color: var(--green); background: rgba(34, 197, 94, 0.05); }
+        .status-text { font-size: 0.85rem; margin-top: 1rem; text-align: center; font-weight: 600; }
+        .status-text.success { color: var(--green); }
+        .status-text.error { color: #ef4444; }
 
         .show-mobile { display: none; }
         .hide-mobile { display: block; }
+        .no-results { text-align: center; color: var(--text-muted); margin-top: 2rem; }
 
-        /* Mobile Specific Layout Adjustments */
         @media (max-width: 640px) {
           .mobile-menu-toggle { display: block; }
           .nav-pills { 
             display: none; position: absolute; top: 100%; left: 0; right: 0; 
-            background: rgba(15, 23, 42, 0.95); border-radius: 0; flex-direction: column; 
+            background: rgba(15, 23, 42, 0.98); border-radius: 0; flex-direction: column; 
             padding: 1.5rem; border-bottom: 1px solid var(--glass-border); 
           }
           .nav-pills.mobile-open { display: flex; }
           .nav-pills button { width: 100%; padding: 1rem; border-radius: 12px; text-align: left; font-size: 1.1rem; }
 
           .gradient-title { font-size: 2.2rem; }
+          .hero { padding-top: 1rem; }
           
           .grid { grid-template-columns: 1fr; }
-          .admin-header { flex-direction: row; align-items: center; }
           
           .show-mobile { display: block; }
           .hide-mobile { display: none; }
@@ -562,19 +586,18 @@ export default function App() {
           .mobile-ids { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.4rem; font-family: monospace; }
           
           .modal-overlay { align-items: flex-end; }
-          .modal { padding-bottom: 2rem; }
+          .modal { padding-bottom: 3rem; }
         }
 
-        /* Desktop Layout Adjustments */
         @media (min-width: 641px) {
           .grid { grid-template-columns: repeat(2, 1fr); padding: 0 2rem 2rem; }
           .gradient-title { font-size: 3.5rem; }
           .modal-overlay { align-items: center; }
           .modal { width: 450px; border-radius: 1.5rem !important; animation: fadeIn 0.2s; }
           .modal.wide { width: 600px; }
-          .form-grid { grid-template-columns: 1fr 1fr; }
-          .modal-actions { flex-direction: row; justify-content: flex-end; }
-          .icon-only { padding: 0.6rem; }
+          .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+          .modal-actions { display: flex; flex-direction: row; justify-content: flex-end; gap: 1rem; margin-top: 2rem; }
+          .icon-only { padding: 0.6rem; width: 38px; height: 38px; }
           @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         }
 
@@ -585,9 +608,12 @@ export default function App() {
         .status-footer { 
           position: fixed; bottom: 1rem; right: 1rem; 
           display: flex; gap: 0.75rem; font-size: 0.7rem; 
-          background: rgba(15, 23, 42, 0.8); padding: 0.4rem 0.8rem; 
-          border-radius: 99px; border: 1px solid var(--glass-border); 
+          background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px);
+          padding: 0.4rem 0.8rem; border-radius: 99px; border: 1px solid var(--glass-border); 
         }
+        .status-item { display: flex; align-items: center; gap: 4px; color: var(--text-muted); }
+        .divider { padding-left: 0.75rem; border-left: 1px solid var(--glass-border); }
+        .loading-screen { height: 100vh; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--orange); }
       `}</style>
     </div>
   );
