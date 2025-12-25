@@ -543,7 +543,7 @@ export default function App() {
       )}
 
       <footer style={{marginTop: '40px', paddingBottom: '30px', textAlign: 'center', opacity: 0.3, fontSize: '0.75rem', letterSpacing: '1px'}}>
-        <p>CK RDC SYSTEM V3.0 | LIVE RECORDS: {items.length}</p>
+        <p>MUHAMMAD.AZEEM@CIRCLEK.COM | LIVE RECORDS: {items.length}</p>
       </footer>
     </div>
   );
